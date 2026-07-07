@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#bfefff">
+<title>ゆるねこ一言帖</title>
+<style>
+:root{
+  --bg:#edfaff;--bg2:#f8fdff;--card:#fff;--ink:#2b2f3a;--muted:#6e7882;
+  --line:#d3edf6;--blue:#78c7df;--blue-dark:#347b91;--soft:#f7fdff;
+  --cream:#fff9df;--pink:#ffeaf3;--danger:#c45b5b;--gold:#f2d36b;
+  --shadow:0 16px 40px rgba(91,148,166,.18)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at top left,#d8f6ff 0,transparent 42%),
+    radial-gradient(circle at 90% 10%,#fff7d7 0,transparent 28%),
+    linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%);
+}
+.app{width:min(820px,100%);margin:0 auto;padding:24px 16px 52px}
+.hero,.panel,.toast{
+  background:rgba(255,255,255,.94);
+  border:1px solid var(--line);
+  border-radius:30px;
+  box-shadow:var(--shadow);
+}
+.hero{padding:26px 24px;position:relative;overflow:hidden}
+.hero:after{
+  content:"🐈";position:absolute;right:20px;top:16px;font-size:52px;opacity:.16;transform:rotate(-10deg)
+}
+.eyebrow{margin:0 0 8px;color:var(--blue-dark);font-weight:850;letter-spacing:.14em;font-size:.78rem}
+h1{font-size:2.35rem;line-height:1.08;margin:0 0 12px;letter-spacing:-.04em}
+h2{margin:0 0 18px;font-size:1.35rem}
+h3{margin:0}
+.hero p:last-child{margin:0;color:var(--muted);line-height:1.75}
+.todayBox{
+  margin-top:16px;padding:14px 16px;border-radius:22px;background:linear-gradient(120deg,#effbff,#fffdf0);
+  border:1px solid var(--line);color:var(--blue-dark);font-weight:780;line-height:1.6
+}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:18px 0}
+button{
+  font:inherit;border:0;border-radius:999px;padding:12px 11px;font-weight:780;cursor:pointer;
+  -webkit-tap-highlight-color:transparent
+}
+.tab,.ghost,.mini{
+  background:rgba(255,255,255,.92);color:var(--blue-dark);border:1px solid var(--line)
+}
+.tab{font-size:.9rem;white-space:nowrap}
+.tab.active,.primary,.mini.active{
+  background:var(--blue);color:#fff;box-shadow:0 8px 20px rgba(74,157,184,.22)
+}
+.panel{display:none;padding:22px}
+.panel.active{display:block}
+label{display:block;margin:0 0 18px}
+label span,.fieldTitle{display:block;font-weight:850;margin:0 0 8px}
+input,textarea,select{
+  width:100%;border:1px solid var(--line);border-radius:18px;padding:14px 16px;
+  font:inherit;background:#fff;color:var(--ink)
+}
+textarea{resize:vertical}
+input:focus,textarea:focus,select:focus{outline:3px solid rgba(120,199,223,.25);border-color:var(--blue)}
+.grid2{display:grid;gap:14px}
+.previewWrap{margin:-8px 0 18px;background:var(--soft);border:1px dashed var(--line);border-radius:22px;padding:10px}
+.previewWrap img{width:100%;max-height:360px;object-fit:cover;border-radius:16px;display:block}
+.hidden{display:none!important}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.primary,.ghost{min-height:46px}
+.sectionHead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.count{color:var(--blue-dark);font-weight:850}
+.search{margin-bottom:12px}
+.filterRow{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap}
+.mini{padding:9px 14px;font-size:.9rem}
+.empty{color:var(--muted);background:var(--soft);border-radius:18px;padding:16px;line-height:1.7}
+.entries{display:grid;gap:16px}
+.entry{
+  border:1px solid var(--line);border-radius:26px;padding:16px;background:#fff;position:relative;overflow:hidden
+}
+.entry.favoriteEntry{background:linear-gradient(180deg,#fffefa,#fff)}
+.entryTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.entry time{color:var(--muted);font-weight:760;font-size:.86rem}
+.entry h3{margin:7px 0 10px;white-space:pre-wrap;line-height:1.65;font-size:1.15rem}
+.fav{background:#fff7c7;color:#9d7b00;min-width:44px;padding:10px 12px}
+.fav.on{background:#ffe88a}
+.photoGrid{display:grid;grid-template-columns:1fr;gap:10px;margin:10px 0}
+.photoGrid img{width:100%;max-height:360px;object-fit:cover;border-radius:18px}
+.reading,.memo{white-space:pre-wrap;line-height:1.75;color:var(--muted);margin:10px 0 0}
+.tagList{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tag{
+  background:#e9f9fe;color:var(--blue-dark);border-radius:999px;padding:6px 10px;font-size:.85rem;font-weight:750
+}
+.entryButtons{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.deleteBtn,.cardBtn{
+  background:#fff;border:1px solid var(--line);color:var(--blue-dark);padding:9px 14px;font-size:.92rem
+}
+.deleteBtn{color:var(--danger);border-color:#f0cccc}
+.cardPreview{
+  background:linear-gradient(180deg,#ffffff,#effbff);border:1px solid var(--line);
+  border-radius:26px;padding:18px;margin-top:14px
+}
+.cardCanvasWrap{display:grid;place-items:center;margin-top:12px}
+canvas{max-width:100%;border-radius:22px;box-shadow:var(--shadow)}
+.statsGrid{display:grid;gap:12px}
+.statCard{background:#fff;border:1px solid var(--line);border-radius:24px;padding:16px}
+.statNum{font-size:2rem;font-weight:900;color:var(--blue-dark)}
+.wordCloud{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.wordPill{background:var(--cream);border:1px solid #f5e7a6;border-radius:999px;padding:8px 12px;font-weight:800}
+.note{color:var(--muted);line-height:1.8}
+.importBox{margin-top:18px;padding:18px;background:var(--soft);border:1px solid var(--line);border-radius:22px}
+.toast{
+  position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+  padding:12px 16px;color:var(--blue-dark);font-weight:850;z-index:10;display:none
+}
+.toast.show{display:block}
+.small{font-size:.88rem;color:var(--muted);line-height:1.7}
+.dangerZone{margin-top:18px;padding:16px;border:1px dashed #efb5b5;border-radius:22px;background:#fffafa}
+@media (min-width:700px){
+  .grid2{grid-template-columns:1fr 1fr}.photoGrid{grid-template-columns:repeat(2,1fr)}.statsGrid{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:390px){
+  h1{font-size:2rem}.tabs{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<main class="app">
+  <section class="hero">
+    <p class="eyebrow">MY LITTLE CAT NOTE</p>
+    <h1>ゆるねこ一言帖</h1>
+    <p>今日の一枚をつくり、言葉を展示し、未来の自分にそっと渡す。<br>あこちゃんだけの小さな私設美術館。</p>
+    <div id="todayMemory" class="todayBox">今日は、最初の一枚を迎える日。</div>
+  </section>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="create">つくる</button>
+    <button class="tab" data-tab="library">図書館</button>
+    <button class="tab" data-tab="words">ことば</button>
+    <button class="tab" data-tab="cardmaker">画像</button>
+    <button class="tab" data-tab="backup">控え</button>
+  </nav>
+
+  <section id="create" class="panel active">
+    <h2>今日の一枚をつくる</h2>
+    <form id="entryForm">
+      <div class="grid2">
+        <label><span>日付</span><input id="date" type="date" required></label>
+        <label><span>今日のカード名</span><input id="cardName" type="text" placeholder="例：カップのペイジ / 女教皇 逆位置"></label>
+      </div>
+
+      <div class="grid2">
+        <div>
+          <label><span>今日のカード写真</span><input id="cardPhoto" type="file" accept="image/*"></label>
+          <div id="cardPreviewWrap" class="previewWrap hidden"><img id="cardPreview" alt="カード写真のプレビュー"></div>
+        </div>
+        <div>
+          <label><span>今日のねこ写真</span><input id="catPhoto" type="file" accept="image/*"></label>
+          <div id="catPreviewWrap" class="previewWrap hidden"><img id="catPreview" alt="ねこ写真のプレビュー"></div>
+        </div>
+      </div>
+
+      <label><span>ゆるねこ一言</span><textarea id="phrase" rows="3" placeholder="例：心のコップは、八分目が歩きやすい。" required></textarea></label>
+      <label><span>カード解説メモ</span><textarea id="reading" rows="4" placeholder="カードの意味、ソラさんの解説、自分の気づき"></textarea></label>
+      <div class="grid2">
+        <label><span>タグ</span><input id="tags" type="text" placeholder="巡航速度, お茶目, 余裕"></label>
+        <label><span>今日の気分</span><select id="mood"><option value="">選ばない</option><option>軽い</option><option>眠い</option><option>ごきげん</option><option>巡航速度</option><option>考え中</option><option>整える</option></select></label>
+      </div>
+      <label><span>ひとことメモ</span><textarea id="memo" rows="3" placeholder="あとで思い出したいこと"></textarea></label>
+
+      <div class="actions">
+        <button type="submit" class="primary">今日はこれでいい</button>
+        <button type="button" id="clearForm" class="ghost">入力を空にする</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="library" class="panel">
+    <div class="sectionHead"><h2>ゆるねこ図書館</h2><span id="count" class="count">0枚</span></div>
+    <input id="search" class="search" type="search" placeholder="一言・カード名・タグ・メモを検索">
+    <div class="filterRow">
+      <button id="showAll" class="mini active">全部</button>
+      <button id="showFav" class="mini">お気に入り</button>
+      <button id="sortNew" class="mini active">新しい順</button>
+      <button id="sortOld" class="mini">古い順</button>
+    </div>
+    <p id="empty" class="empty">まだ展示はありません。最初の一枚をつくろう。</p>
+    <div id="entries" class="entries"></div>
+  </section>
+
+  <section id="words" class="panel">
+    <h2>ことばの庭</h2>
+    <div class="statsGrid">
+      <div class="statCard"><div class="statNum" id="totalCount">0</div><div>展示した一枚</div></div>
+      <div class="statCard"><div class="statNum" id="favCount">0</div><div>お気に入り</div></div>
+      <div class="statCard"><div class="statNum" id="tagCount">0</div><div>育ったタグ</div></div>
+    </div>
+    <div class="statCard" style="margin-top:14px">
+      <h3>よく出るタグ</h3>
+      <div id="tagCloud" class="wordCloud"></div>
+    </div>
+    <div class="statCard" style="margin-top:14px">
+      <h3>今年の合言葉候補</h3>
+      <p id="yearPhrase" class="note">まだ言葉を集計できません。</p>
+    </div>
+  </section>
+
+  <section id="cardmaker" class="panel">
+    <h2>一言画像をつくる</h2>
+    <p class="note">図書館の「画像を作る」から選ぶと、ここにカード画像ができます。長押しで写真に保存できます。</p>
+    <div id="makerEmpty" class="empty">まだ選ばれていません。</div>
+    <div id="makerBox" class="cardPreview hidden">
+      <h3 id="makerPhrase"></h3>
+      <div class="cardCanvasWrap"><canvas id="shareCanvas" width="1080" height="1350"></canvas></div>
+    </div>
+  </section>
+
+  <section id="backup" class="panel">
+    <h2>控えをとる</h2>
+    <p class="note">保存はこの端末のSafari内にあります。大事な作品が増えたら、控えをダウンロードしておくと安心。</p>
+    <div class="actions">
+      <button id="exportBtn" class="primary">控えをダウンロード</button>
+      <button id="sampleBtn" class="ghost">お試し一枚を入れる</button>
+    </div>
+    <label class="importBox"><span>控えを読み込む</span><input id="importFile" type="file" accept="application/json"></label>
+    <div class="dangerZone">
+      <h3>全部消す</h3>
+      <p class="small">本当に最初からやり直すときだけ使ってね。</p>
+      <button id="clearAllBtn" class="deleteBtn">すべて削除</button>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<template id="entryTemplate">
+  <article class="entry">
+    <div class="entryTop">
+      <div><time></time><h3></h3><p class="small cardLine"></p></div>
+      <button class="fav" aria-label="お気に入り">☆</button>
+    </div>
+    <div class="photoGrid"></div>
+    <p class="reading"></p>
+    <p class="memo"></p>
+    <div class="tagList"></div>
+    <div class="entryButtons">
+      <button class="cardBtn makeImageBtn">画像を作る</button>
+      <button class="deleteBtn">削除</button>
+    </div>
+  </article>
+</template>
+
+<script>
+const STORAGE_KEY='yuruneko_entries_best_v1';
+const $=id=>document.getElementById(id);
+const tabs=document.querySelectorAll('.tab'),panels=document.querySelectorAll('.panel');
+const form=$('entryForm'),dateInput=$('date'),cardNameInput=$('cardName'),cardPhotoInput=$('cardPhoto'),catPhotoInput=$('catPhoto'),phraseInput=$('phrase'),readingInput=$('reading'),tagsInput=$('tags'),moodInput=$('mood'),memoInput=$('memo');
+const cardPreviewWrap=$('cardPreviewWrap'),cardPreview=$('cardPreview'),catPreviewWrap=$('catPreviewWrap'),catPreview=$('catPreview');
+const entriesEl=$('entries'),emptyEl=$('empty'),searchInput=$('search'),countEl=$('count'),template=$('entryTemplate'),toast=$('toast');
+let entries=loadEntries(),cardPhotoData='',catPhotoData='',favoritesOnly=false,sortMode='new',selectedForImage=null;
+dateInput.valueAsDate=new Date();init();
+
+function init(){
+  tabs.forEach(tab=>tab.addEventListener('click',()=>switchTab(tab.dataset.tab)));
+  cardPhotoInput.addEventListener('change',async e=>{cardPhotoData=await fileToDataUrl(e.target.files[0]);showPreview(cardPhotoData,cardPreview,cardPreviewWrap)});
+  catPhotoInput.addEventListener('change',async e=>{catPhotoData=await fileToDataUrl(e.target.files[0]);showPreview(catPhotoData,catPreview,catPreviewWrap)});
+  form.addEventListener('submit',saveNewEntry);
+  $('clearForm').addEventListener('click',resetForm);
+  searchInput.addEventListener('input',renderEntries);
+  $('showAll').addEventListener('click',()=>{favoritesOnly=false;activeMini('showAll','showFav');renderEntries()});
+  $('showFav').addEventListener('click',()=>{favoritesOnly=true;activeMini('showFav','showAll');renderEntries()});
+  $('sortNew').addEventListener('click',()=>{sortMode='new';activeMini('sortNew','sortOld');renderEntries()});
+  $('sortOld').addEventListener('click',()=>{sortMode='old';activeMini('sortOld','sortNew');renderEntries()});
+  $('exportBtn').addEventListener('click',exportBackup);
+  $('importFile').addEventListener('change',importBackup);
+  $('clearAllBtn').addEventListener('click',clearAll);
+  $('sampleBtn').addEventListener('click',addSample);
+  renderAll();
+}
+function saveNewEntry(e){
+  e.preventDefault();
+  const entry={
+    id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),
+    date:dateInput.value,cardName:cardNameInput.value.trim(),phrase:phraseInput.value.trim(),
+    reading:readingInput.value.trim(),tags:tagsInput.value.split(',').map(t=>t.trim()).filter(Boolean),
+    mood:moodInput.value,memo:memoInput.value.trim(),cardPhoto:cardPhotoData,catPhoto:catPhotoData,
+    favorite:false,createdAt:new Date().toISOString()
+  };
+  entries.unshift(entry);saveEntries();resetForm();renderAll();switchTab('library');showToast('展示しました');
+}
+function resetForm(){form.reset();dateInput.valueAsDate=new Date();cardPhotoData='';catPhotoData='';cardPreviewWrap.classList.add('hidden');catPreviewWrap.classList.add('hidden')}
+function renderAll(){renderEntries();renderStats();renderTodayMemory()}
+function renderEntries(){
+  const q=searchInput.value.trim().toLowerCase();
+  let filtered=entries.filter(en=>{
+    const text=[en.date,en.cardName,en.phrase,en.reading,en.memo,en.mood,...(en.tags||[])].join(' ').toLowerCase();
+    return(!q||text.includes(q))&&(!favoritesOnly||en.favorite)
+  });
+  filtered.sort((a,b)=>sortMode==='new'?(b.date||'').localeCompare(a.date||''):(a.date||'').localeCompare(b.date||''));
+  entriesEl.innerHTML='';countEl.textContent=`${filtered.length}枚`;emptyEl.style.display=filtered.length?'none':'block';
+  filtered.forEach(en=>{
+    const node=template.content.cloneNode(true),article=node.querySelector('.entry');
+    article.classList.toggle('favoriteEntry',!!en.favorite);
+    node.querySelector('time').textContent=formatDate(en.date);
+    node.querySelector('h3').textContent=en.phrase;
+    const cardLine=node.querySelector('.cardLine');cardLine.textContent=[en.cardName,en.mood].filter(Boolean).join(' ・ ');cardLine.style.display=cardLine.textContent?'block':'none';
+    const fav=node.querySelector('.fav');fav.textContent=en.favorite?'★':'☆';fav.classList.toggle('on',en.favorite);
+    const grid=node.querySelector('.photoGrid');addPhoto(grid,en.cardPhoto,'カード写真');addPhoto(grid,en.catPhoto,'ねこ写真');
+    const reading=node.querySelector('.reading');reading.textContent=en.reading||'';reading.style.display=en.reading?'block':'none';
+    const memo=node.querySelector('.memo');memo.textContent=en.memo||'';memo.style.display=en.memo?'block':'none';
+    const tagList=node.querySelector('.tagList');[...(en.tags||[]),en.mood].filter(Boolean).forEach(tag=>{const s=document.createElement('span');s.className='tag';s.textContent=tag;tagList.appendChild(s)});
+    fav.addEventListener('click',()=>{en.favorite=!en.favorite;saveEntries();renderAll();showToast(en.favorite?'お気に入りにしました':'お気に入りを外しました')});
+    node.querySelector('.deleteBtn').addEventListener('click',()=>{if(confirm('この一枚を削除しますか？')){entries=entries.filter(e=>e.id!==en.id);saveEntries();renderAll();showToast('削除しました')}});
+    node.querySelector('.makeImageBtn').addEventListener('click',()=>{selectedForImage=en;makeShareImage(en);switchTab('cardmaker')});
+    entriesEl.appendChild(node);
+  });
+}
+function renderStats(){
+  $('totalCount').textContent=entries.length;
+  $('favCount').textContent=entries.filter(e=>e.favorite).length;
+  const tagMap={};
+  entries.forEach(e=>[...(e.tags||[]),e.mood].filter(Boolean).forEach(t=>tagMap[t]=(tagMap[t]||0)+1));
+  const tags=Object.entries(tagMap).sort((a,b)=>b[1]-a[1]);
+  $('tagCount').textContent=tags.length;
+  $('tagCloud').innerHTML=tags.length?tags.slice(0,24).map(([t,n])=>`<span class="wordPill">${escapeHtml(t)} ${n}</span>`).join(''):'<p class="note">タグはまだ育っていません。</p>';
+  $('yearPhrase').textContent=makeYearPhrase(tags);
+}
+function renderTodayMemory(){
+  if(!entries.length){$('todayMemory').textContent='今日は、最初の一枚を迎える日。';return}
+  const today=new Date(),m=today.getMonth(),d=today.getDate();
+  const same=entries.find(e=>{const dt=new Date((e.date||'')+'T00:00:00');return dt.getMonth()===m&&dt.getDate()===d&&dt.getFullYear()!==today.getFullYear()});
+  $('todayMemory').textContent=same?`去年の今日は：「${same.phrase}」`:`最近の一枚：「${entries[0].phrase}」`;
+}
+function makeYearPhrase(tags){
+  if(!entries.length)return'まだ言葉を集計できません。';
+  if(tags.length)return`今いちばん育っている言葉は「${tags[0][0]}」。焦らず、でもちゃんと進んでいる。`;
+  return'言葉はまだ小さな芽。まずは一枚ずつ。';
+}
+function makeShareImage(en){
+  $('makerEmpty').classList.add('hidden');$('makerBox').classList.remove('hidden');$('makerPhrase').textContent=en.phrase;
+  const canvas=$('shareCanvas'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
+  ctx.fillStyle='#edfaff';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#ffffff';roundRect(ctx,70,70,W-140,H-140,54,true,false);
+  ctx.fillStyle='#347b91';ctx.font='bold 38px sans-serif';ctx.fillText('ゆるねこ一言帖',110,140);
+  ctx.fillStyle='#6e7882';ctx.font='28px sans-serif';ctx.fillText(formatDate(en.date),110,190);
+  const imgSrc=en.catPhoto||en.cardPhoto;
+  if(imgSrc){const img=new Image();img.onload=()=>{drawImageCover(ctx,img,110,230,W-220,620,34);drawTextBlock(ctx,en.phrase,110,930,W-220,56,'#2b2f3a','bold 48px sans-serif');drawFooter(ctx,en);};img.src=imgSrc}else{drawTextBlock(ctx,en.phrase,110,430,W-220,60,'#2b2f3a','bold 54px sans-serif');drawFooter(ctx,en)}
+}
+function drawFooter(ctx,en){
+  ctx.fillStyle='#78c7df';ctx.font='bold 32px sans-serif';ctx.fillText('今日はこれでいい',110,1230);
+  ctx.fillStyle='#6e7882';ctx.font='26px sans-serif';ctx.fillText([en.cardName,...(en.tags||[]).slice(0,2)].filter(Boolean).join(' ・ '),110,1280);
+}
+function drawTextBlock(ctx,text,x,y,maxWidth,lineHeight,color,font){
+  ctx.fillStyle=color;ctx.font=font;
+  const chars=[...text],lines=[];let line='';
+  chars.forEach(ch=>{const test=line+ch;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=ch}else line=test});
+  if(line)lines.push(line);lines.slice(0,5).forEach((l,i)=>ctx.fillText(l,x,y+i*lineHeight));
+}
+function roundRect(ctx,x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();if(fill)ctx.fill();if(stroke)ctx.stroke()}
+function drawImageCover(ctx,img,x,y,w,h,r){ctx.save();roundRect(ctx,x,y,w,h,r,false,false);ctx.clip();const s=Math.max(w/img.width,h/img.height),nw=img.width*s,nh=img.height*s;ctx.drawImage(img,x+(w-nw)/2,y+(h-nh)/2,nw,nh);ctx.restore()}
+function addPhoto(parent,src,alt){if(!src)return;const img=document.createElement('img');img.src=src;img.alt=alt;parent.appendChild(img)}
+function showPreview(data,img,wrap){if(!data)return;img.src=data;wrap.classList.remove('hidden')}
+function fileToDataUrl(file){return new Promise(resolve=>{if(!file)return resolve('');const r=new FileReader();r.onload=()=>resolve(r.result);r.readAsDataURL(file)})}
+function exportBackup(){const blob=new Blob([JSON.stringify(entries,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`yuruneko-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(url)}
+async function importBackup(e){const file=e.target.files[0];if(!file)return;try{const imported=JSON.parse(await file.text());if(!Array.isArray(imported))throw new Error();entries=imported;saveEntries();renderAll();showToast('控えを読み込みました')}catch{alert('読み込めませんでした')}}
+function clearAll(){if(confirm('すべて削除しますか？控えがない場合は戻せません。')){entries=[];saveEntries();renderAll();showToast('空にしました')}}
+function addSample(){entries.unshift({id:String(Date.now()),date:new Date().toISOString().slice(0,10),cardName:'サンプルカード',phrase:'心のコップは、八分目が歩きやすい。',reading:'これはお試しの一枚です。保存や検索の動きを確認できます。',tags:['巡航速度','余裕'],mood:'整える',memo:'最初の展示サンプル。',cardPhoto:'',catPhoto:'',favorite:true,createdAt:new Date().toISOString()});saveEntries();renderAll();showToast('お試し一枚を入れました')}
+function saveEntries(){localStorage.setItem(STORAGE_KEY,JSON.stringify(entries))}
+function loadEntries(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[]}catch{return[]}}
+function formatDate(value){if(!value)return'';return new Date(value+'T00:00:00').toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'short'})}
+function switchTab(name){tabs.forEach(t=>t.classList.toggle('active',t.dataset.tab===name));panels.forEach(p=>p.classList.toggle('active',p.id===name));window.scrollTo({top:0,behavior:'smooth'})}
+function activeMini(on,off){$(on).classList.add('active');$(off).classList.remove('active')}
+function showToast(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1600)}
+function escapeHtml(str){return String(str).replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[s]))}
+</script>
+</body>
+</html>
