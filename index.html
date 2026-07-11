@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#c9f6ff">
+<title>ゆるねこ一言帖 Version 24 総当たり復旧版</title>
+<style>
+:root{
+  --bg:#eafbff;--card:#fff;--ink:#292b36;--sub:#6f7e87;
+  --blue:#72c7df;--blue2:#e8fbff;--line:#d6edf4;--pink:#ffedf5;
+  --shadow:0 14px 34px rgba(83,145,164,.20);--radius:28px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;padding:18px 14px 50px;
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 0 0,#c9f6ff 0 32%,transparent 52%),
+    radial-gradient(circle at 100% 100%,#fff2c8 0 28%,transparent 55%),
+    linear-gradient(135deg,var(--bg),#fff);
+}
+.app{max-width:760px;margin:0 auto}
+.box,.entry{
+  background:rgba(255,255,255,.96);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:22px;
+  margin:0 0 16px;
+}
+.eyebrow{font-size:13px;font-weight:900;letter-spacing:.2em;color:#367d90}
+h1{font-size:clamp(42px,11vw,70px);line-height:1;margin:8px 0 16px;letter-spacing:-.04em}
+h2{font-size:28px;margin:0 0 16px}
+p{line-height:1.65}
+.cat{font-size:52px;margin:0 0 10px}
+.motto{display:inline-block;margin-top:10px;padding:12px 16px;border-radius:999px;background:var(--blue2);border:1px solid var(--line);font-weight:900;color:#347b8e}
+.status{font-size:14px;margin-top:8px;color:#347b8e;font-weight:900}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:16px}
+.tab{border:1px solid var(--line);border-radius:999px;background:#fff;color:#347b8e;font-weight:900;padding:13px 6px;font-size:15px}
+.tab.on{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 10px 22px rgba(114,199,223,.35)}
+.panel{display:none}.panel.on{display:block}
+label{display:block;margin:16px 0 7px;font-weight:900}
+input,textarea{
+  width:100%;border:1px solid var(--line);border-radius:17px;background:#fff;padding:14px;
+  font:inherit;font-size:16px;color:var(--ink)
+}
+textarea{min-height:90px;resize:vertical}
+input[type=file]{padding:10px}
+.preview{margin-top:10px;padding:10px;border:1px dashed var(--line);border-radius:20px;background:#fbfeff}
+.preview img,.entry img,.detailPhoto{width:100%;display:block;border-radius:18px;max-height:680px;object-fit:contain;background:#f8fdff}
+.tagGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+.tagBox{
+  display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;
+  border-radius:999px;padding:11px 13px;font-weight:900;color:#347b8e
+}
+.tagBox input{width:auto;margin:0;accent-color:#72c7df}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+button{cursor:pointer}
+.btn{border:1px solid var(--line);border-radius:999px;font-weight:900;font-size:16px;padding:13px 17px;background:#fff;color:#347b8e}
+.primary{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 10px 22px rgba(114,199,223,.35)}
+.danger{color:#d05a75}
+.note{background:#f6fcff;border:1px solid var(--line);border-radius:22px;color:var(--sub);padding:16px;line-height:1.7}
+.ok{background:#f2fff8;border-color:#cbeedc;color:#26754f}
+.warn{background:#fffaf0;border-color:#f2dfb7;color:#8a6420}
+.libraryTop{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.count{font-weight:900;color:#347b8e;font-size:24px}
+.grid{display:grid;gap:14px;margin-top:14px}
+.entry{padding:16px;cursor:pointer}
+.entry:active{transform:scale(.995)}
+.entryMini{display:grid;grid-template-columns:92px 1fr;gap:13px;align-items:start}
+.thumb{width:92px;height:92px;border-radius:18px;object-fit:cover;background:#f8fdff;border:1px solid var(--line)}
+.thumbEmpty{display:flex;align-items:center;justify-content:center;color:#9ab0b8;font-weight:900}
+.date{font-weight:900;color:#347b8e}
+.time{font-size:13px;color:var(--sub);margin-top:2px}
+.name{color:#4f5f68;font-size:14px;margin-top:3px;font-weight:800}
+.hitokoto{font-weight:900;font-size:20px;line-height:1.45;margin:8px 0}
+.detailHitokoto{font-weight:900;font-size:25px;line-height:1.5;margin:14px 0}
+.meta{color:var(--sub);font-size:14px;white-space:pre-wrap;line-height:1.6}
+.tagPill{display:inline-block;margin:6px 6px 0 0;padding:7px 10px;border-radius:999px;background:var(--blue2);border:1px solid var(--line);font-size:13px;font-weight:900;color:#347b8e}
+.detailSection{margin-top:14px;padding:12px;border-radius:18px;background:#f8fdff;border:1px solid var(--line)}
+.detailTitle{font-weight:900;color:#347b8e;margin:2px 0 6px}
+.small{font-size:13px;color:var(--sub);text-align:center;margin-top:20px}
+.hide{display:none!important}
+.backBtn{margin-bottom:14px}
+.editMain{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 10px 22px rgba(114,199,223,.35)}
+.tagPill{cursor:pointer}
+.modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.84);
+  display:none;align-items:center;justify-content:center;z-index:9999;padding:18px;
+}
+.modal.open{display:flex}
+.modal img{max-width:100%;max-height:88vh;border-radius:18px;background:#fff}
+.modalClose{
+  position:fixed;top:14px;right:14px;border:1px solid rgba(255,255,255,.45);
+  background:rgba(255,255,255,.16);color:#fff;border-radius:999px;
+  padding:10px 14px;font-weight:900;font-size:16px
+}
+.detailPhoto{cursor:zoom-in}
+.backupBox{background:#f2fff8;border:1px solid #cbeedc;border-radius:22px;padding:16px;margin:12px 0;color:#26754f;line-height:1.7}
+.backupBox strong{font-weight:900}
+.backupStep{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px;margin-top:10px}.fileNameBox{font-weight:900;color:#26754f}
+.tagList{display:flex;gap:8px;overflow-x:auto;white-space:nowrap;margin-top:14px;padding:2px 2px 10px;-webkit-overflow-scrolling:touch}
+.tagList .btn{flex:0 0 auto}
+.searchWrap{position:relative}
+.searchWrap input{padding-right:82px}
+.clearSearch{position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:8px 12px;font-size:13px}
+.randomBox{margin-top:14px}
+.popularBox{margin-top:14px}
+.randomBox img{width:100%;border-radius:18px;margin-top:12px;max-height:520px;object-fit:contain;background:#f8fdff}
+@media(max-width:430px){
+  body{padding:12px 14px 44px}
+  .box{padding:20px}
+  .tabs{grid-template-columns:repeat(4,1fr)}
+  .tab{font-size:14px}
+  .tagGrid{grid-template-columns:1fr 1fr}
+  .entryMini{grid-template-columns:84px 1fr}
+  .thumb{width:84px;height:84px}
+}
+</style>
+</head>
+<body>
+<main class="app">
+<section class="box">
+  <div class="eyebrow">MY LITTLE CAT NOTE</div>
+  <h1>ゆるねこ一言帖</h1>
+  <div class="cat">🐈</div>
+  <p>一日一枚でも、何枚でも。今日の言葉を、ねこと一緒に残していく。</p>
+  <div class="motto" id="motto">最初の一枚を迎える日。</div>
+  <div class="status" id="saveStatus">保存庫を確認中…</div>
+  <div class="status" id="backupMini">控え：まだありません</div>
+</section>
+
+<nav class="tabs">
+  <button class="tab on" data-tab="make">つくる</button>
+  <button class="tab" data-tab="library">図書館</button>
+  <button class="tab" data-tab="test">保存確認</button>
+  <button class="tab" data-tab="backup">控え</button>
+</nav>
+
+<section id="make" class="panel on box">
+  <h2 id="formTitle">一枚をつくる</h2>
+  <form id="form">
+    <label>日付</label>
+    <input id="date" type="date" required>
+
+    <label>カード名</label>
+    <input id="cardName" placeholder="例：吊るされた男 逆位置" required>
+
+    <label>タグ</label>
+    <div class="tagGrid" id="tagGrid"></div>
+
+    <label>ねこ写真</label>
+    <input id="catPhoto" type="file" accept="image/*">
+    <div id="catPreview" class="preview hide"></div>
+
+    <label>ゆるねこ一言</label>
+    <textarea id="hitokoto" required placeholder="考える時間は、ここまで。あとは動こう。"></textarea>
+
+    <label>カード解説メモ</label>
+    <textarea id="reading" placeholder="カードの意味、ソラさんの解説、自分の気づき"></textarea>
+
+    <label>ひとことメモ</label>
+    <textarea id="memo" placeholder="あとで思い出したいこと"></textarea>
+
+    <div class="actions">
+      <button class="btn primary" type="submit" id="submitBtn">今日はこれでいい</button>
+      <button class="btn" type="button" id="clear">入力を空にする</button>
+      <button class="btn danger hide" type="button" id="cancelEdit">編集をやめる</button>
+    </div>
+    <div class="status" id="formStatus"></div>
+  </form>
+</section>
+
+<section id="library" class="panel box">
+  <div id="libraryListView">
+    <div class="libraryTop"><h2>ゆるねこ図書館</h2><div class="count">作品：<span id="count">0</span>枚</div></div>
+    <div class="searchWrap">
+      <input id="search" placeholder="一言・カード名・タグ・メモを検索">
+      <button class="btn clearSearch" id="clearSearch">クリア</button>
+    </div>
+    <div class="actions">
+      <button class="btn" id="all">全部</button>
+      <button class="btn" id="favOnly">お気に入り</button>
+      <button class="btn" id="newFirst">新しい順</button>
+      <button class="btn" id="oldFirst">古い順</button>
+      <button class="btn primary" id="randomOne">ランダムに1枚</button>
+      <button class="btn" id="popularOne">よく読む言葉ランキング</button>
+    </div>
+    <div class="tagList" id="tagList"></div>
+    <div id="randomView" class="randomBox"></div>
+    <div id="popularView" class="popularBox"></div>
+    <div id="list" class="grid"></div>
+  </div>
+  <div id="detailView" class="hide"></div>
+</section>
+
+<section id="test" class="panel box">
+  <h2>保存確認</h2>
+  <div class="note ok" id="testResult">保存庫の状態を確認します。</div>
+  <div class="actions"><button class="btn primary" id="rescueOld">昔の保存庫を探して復旧する</button></div>
+  <div class="status" id="rescueStatus"></div>
+  <div class="actions hide">
+    <button class="btn primary" id="reloadCheck">保存枚数を確認</button>
+    <button class="btn" id="makeTest">テストカードを1枚保存</button>
+  </div>
+  <p class="note warn">同じ日に何枚作ってもOK。機種変更前は「控え」タブで最後の控え日時を確認してね。</p>
+</section>
+
+<section id="backup" class="panel box">
+  <h2>控え・復元</h2>
+
+  <div class="note" id="backupStatus">現在の図書館データを確認中…</div>
+  <div class="note ok" id="lastBackupBox">最後の控え：まだありません</div>
+  <div class="note ok fileNameBox" id="backupFileBox">現在の控えファイル名：まだありません</div>
+
+  <div class="actions">
+    <button class="btn primary" id="export">控えを書き出す</button>
+    <label class="btn primary">図書館を復元する<input id="import" type="file" accept="application/json" style="display:none"></label>
+  </div>
+
+  <div class="backupStep">
+    <strong>📱 機種変更するとき</strong><br><br>
+
+    <strong>今のiPhoneでやること</strong><br>
+    ①「控えを書き出す」を押します。<br>
+    ② ファイルアプリを開きます。<br>
+    ③ iCloud Drive または ダウンロード に<br>
+    <b>yuruneko-backup-〇〇.json</b><br>
+    が保存されていることを確認します。<br><br>
+
+    <strong>新しいiPhoneでやること</strong><br>
+    ① Safariで「ゆるねこ一言帖」を開きます。<br>
+    ②「控え・復元」を開きます。<br>
+    ③「図書館を復元する」を押します。<br>
+    ④ 保存しておいた <b>yuruneko-backup-〇〇.json</b> を選びます。<br><br>
+
+    🎉 図書館が元に戻ります。<br><br>
+
+    <strong>🩵 困ったら</strong><br>
+    ChatGPT（ソラ）に<br>
+    「ゆるねこ一言帖を機種変更したい」<br>
+    と話しかけてください。<br>
+    一歩ずつ一緒に進めます。<br><br>
+
+    <small>この説明は未来の自分へのメモです。<br>
+    機種変更のときだけ開けば大丈夫。</small>
+  </div>
+
+  <div class="backupStep">
+    <strong>控えの目安</strong><br>
+    月1回、機種変更前、iOSアップデート前に書き出しておくと安心。
+  </div>
+
+  <div class="actions hide">
+    <button class="btn danger" id="wipe">全部消す（開発用）</button>
+  </div>
+</section>
+
+<div class="small">Version 24：すべてのIndexedDB・全ストア・localStorageを総当たりで捜索する復旧版。</div>
+<div class="modal" id="photoModal"><button class="modalClose" id="modalClose">閉じる</button><img id="modalImg" alt="拡大写真"></div>
+</main>
+
+<script>
+// Version番号を保存庫名に入れない。今後の更新でも同じ保存庫を使う。
+const DB_NAME='yuruneko_hitokoto_db';
+const OLD_DBS=[
+  'yuruneko_hitokoto_db_v22',
+  'yuruneko_hitokoto_db_v21',
+  'yuruneko_hitokoto_db_v20',
+  'yuruneko_hitokoto_db_v19',
+  'yuruneko_hitokoto_db_v18',
+  'yuruneko_hitokoto_db_v17',
+  'yuruneko_hitokoto_db_v16',
+  'yuruneko_hitokoto_db_v15',
+  'yuruneko_hitokoto_db_v14',
+  'yuruneko_hitokoto_db_v13',
+  'yuruneko_hitokoto_db_v12',
+  'yuruneko_hitokoto_db_v11',
+  'yuruneko_hitokoto_db_v10',
+  'yuruneko_hitokoto_db_v9',
+  'yuruneko_hitokoto_db_v8',
+  'yuruneko_hitokoto_db_v7',
+  'yuruneko_hitokoto_db_v6',
+  'yuruneko_hitokoto_db_v5',
+  'yuruneko_hitokoto_db_v4',
+  'yuruneko_hitokoto_db_v3',
+  'yuruneko_hitokoto_db_v2',
+  'yuruneko_hitokoto_db_v1'
+];
+const STORE='entries';
+const TAGS=['巡航速度','ひとつずつ','一歩','気づき','ごきげん','余裕','手放す','休む'];
+
+let db=null;
+let entries=[];
+let catData='';
+let filter='all';
+let sort='new';
+let editingId=null;
+let originalCreatedAt=null;
+
+const $=id=>document.getElementById(id);
+const BACKUP_KEY='yuruneko_last_backup';
+function backupLabel(){
+  const raw=localStorage.getItem(BACKUP_KEY);
+  if(!raw) return 'まだありません';
+  const d=new Date(Number(raw));
+  if(Number.isNaN(d.getTime())) return 'まだありません';
+  return d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function backupFileName(){
+  const raw=localStorage.getItem(BACKUP_KEY);
+  if(!raw) return 'まだありません';
+  const d=new Date(Number(raw));
+  if(Number.isNaN(d.getTime())) return 'まだありません';
+  return 'yuruneko-backup-'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'.json';
+}
+function updateBackupDisplay(){
+  const text=backupLabel();
+  const mini=$('backupMini');
+  if(mini) mini.textContent='控え：'+text;
+  const box=$('lastBackupBox');
+  if(box) box.textContent='最後の控え：'+text;
+  const fileBox=$('backupFileBox');
+  if(fileBox) fileBox.textContent='現在の控えファイル名：'+backupFileName();
+  const exportBtn=$('export');
+  if(exportBtn) exportBtn.textContent='控えを書き出す';
+}
+$('date').value=new Date().toISOString().slice(0,10);
+
+function buildTags(selected=[]){
+  $('tagGrid').innerHTML=TAGS.map(t=>{
+    return '<label class="tagBox"><input type="checkbox" name="tag" value="'+t+'" '+(selected.includes(t)?'checked':'')+'>'+t+'</label>';
+  }).join('');
+}
+buildTags();
+
+document.querySelectorAll('.tab').forEach(b=>{
+  b.onclick=()=>show(b.dataset.tab);
+});
+function show(id){
+  const rv=$('randomView'); if(rv && id!=='library') rv.innerHTML='';
+  const pv=$('popularView'); if(pv && id!=='library') pv.innerHTML='';
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id===id));
+  if(id==='library'){
+    closeDetail();
+    render();
+  }
+  if(id==='test') updateTest();
+}
+
+function openNamedDB(name){
+  return new Promise((resolve,reject)=>{
+    if(!('indexedDB' in window)){
+      reject(new Error('IndexedDBが使えません'));
+      return;
+    }
+    const req=indexedDB.open(name,1);
+    req.onupgradeneeded=e=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains(STORE)){
+        const s=d.createObjectStore(STORE,{keyPath:'id'});
+        s.createIndex('date','date',{unique:false});
+        s.createIndex('createdAt','createdAt',{unique:false});
+      }
+    };
+    req.onsuccess=e=>resolve(e.target.result);
+    req.onerror=()=>reject(req.error);
+  });
+}
+function txStore(mode='readonly'){
+  return db.transaction(STORE,mode).objectStore(STORE);
+}
+function getAll(){
+  return new Promise((resolve,reject)=>{
+    const req=txStore().getAll();
+    req.onsuccess=()=>resolve(req.result||[]);
+    req.onerror=()=>reject(req.error);
+  });
+}
+function allFromDB(database){
+  return new Promise((resolve,reject)=>{
+    if(!database.objectStoreNames.contains(STORE)){
+      resolve([]);
+      return;
+    }
+    const req=database.transaction(STORE,'readonly').objectStore(STORE).getAll();
+    req.onsuccess=()=>resolve(req.result||[]);
+    req.onerror=()=>reject(req.error);
+  });
+}
+function putEntry(entry){
+  return new Promise((resolve,reject)=>{
+    const req=txStore('readwrite').put(entry);
+    req.onsuccess=()=>resolve();
+    req.onerror=()=>reject(req.error);
+  });
+}
+function deleteEntry(id){
+  return new Promise((resolve,reject)=>{
+    const req=txStore('readwrite').delete(id);
+    req.onsuccess=()=>resolve();
+    req.onerror=()=>reject(req.error);
+  });
+}
+function clearDB(){
+  return new Promise((resolve,reject)=>{
+    const req=txStore('readwrite').clear();
+    req.onsuccess=()=>resolve();
+    req.onerror=()=>reject(req.error);
+  });
+}
+function normalizeEntry(item){
+  const now=Date.now();
+  let tags=item.tags;
+  if(typeof tags==='string'){
+    tags=tags.split(/[、,\s]+/).filter(Boolean);
+  }
+  if(!Array.isArray(tags)) tags=[];
+  return {
+    id:item.id || String(now)+'-'+Math.random().toString(36).slice(2),
+    date:item.date || new Date().toISOString().slice(0,10),
+    createdAt:item.createdAt || now,
+    updatedAt:item.updatedAt || undefined,
+    cardName:item.cardName || '',
+    catPhoto:item.catPhoto || '',
+    hitokoto:item.hitokoto || '',
+    reading:item.reading || '',
+    tags:tags,
+    memo:item.memo || '',
+    fav:!!item.fav,
+    views:item.views || 0,
+    lastViewed:item.lastViewed || undefined
+  };
+}
+async function existingDatabaseNames(){
+  try{
+    if(indexedDB.databases){
+      const list=await indexedDB.databases();
+      const names=(list||[]).map(x=>x.name).filter(Boolean);
+      return new Set([DB_NAME,...OLD_DBS,...names]);
+    }
+  }catch(e){}
+  return new Set([DB_NAME,...OLD_DBS]);
+}
+function newerEntry(a,b){
+  const ta=Math.max(Number(a.updatedAt||0),Number(a.createdAt||0));
+  const tb=Math.max(Number(b.updatedAt||0),Number(b.createdAt||0));
+  return tb>ta?b:a;
+}
+function looksLikeEntry(x){
+  return !!(x && typeof x==='object' && !Array.isArray(x) &&
+    (typeof x.hitokoto==='string' || typeof x.cardName==='string') &&
+    ('date' in x || 'catPhoto' in x || 'reading' in x || 'memo' in x || 'tags' in x));
+}
+function collectEntryCandidates(value,out){
+  if(Array.isArray(value)){
+    value.forEach(v=>collectEntryCandidates(v,out));
+    return;
+  }
+  if(!value || typeof value!=='object') return;
+  if(looksLikeEntry(value)) out.push(value);
+  for(const v of Object.values(value)){
+    if(v && typeof v==='object') collectEntryCandidates(v,out);
+  }
+}
+function allFromAnyStore(database,storeName){
+  return new Promise((resolve,reject)=>{
+    try{
+      const req=database.transaction(storeName,'readonly').objectStore(storeName).getAll();
+      req.onsuccess=()=>resolve(req.result||[]);
+      req.onerror=()=>reject(req.error);
+    }catch(e){reject(e)}
+  });
+}
+async function openExistingDB(name){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open(name);
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function rescueOldData(showMessage=false){
+  const names=await existingDatabaseNames();
+  const merged=new Map();
+  let foundDatabases=0, foundStores=0, foundEntries=0, localHits=0;
+
+  for(const name of names){
+    try{
+      const database=(name===DB_NAME && db)?db:await openExistingDB(name);
+      let dbHad=false;
+      for(const storeName of Array.from(database.objectStoreNames||[])){
+        try{
+          const raw=await allFromAnyStore(database,storeName);
+          const candidates=[];
+          collectEntryCandidates(raw,candidates);
+          if(candidates.length){
+            dbHad=true; foundStores++; foundEntries+=candidates.length;
+            for(const r of candidates){
+              const item=normalizeEntry(r);
+              const key=item.id || [item.date,item.cardName,item.hitokoto].join('|');
+              const prev=merged.get(key);
+              merged.set(key,prev?newerEntry(prev,item):item);
+            }
+          }
+        }catch(e){}
+      }
+      if(dbHad) foundDatabases++;
+      if(name!==DB_NAME) database.close();
+    }catch(e){}
+  }
+
+  try{
+    for(let i=0;i<localStorage.length;i++){
+      const key=localStorage.key(i);
+      const raw=localStorage.getItem(key);
+      if(!raw) continue;
+      try{
+        const parsed=JSON.parse(raw);
+        const candidates=[];
+        collectEntryCandidates(parsed,candidates);
+        if(candidates.length){
+          localHits+=candidates.length; foundEntries+=candidates.length;
+          for(const r of candidates){
+            const item=normalizeEntry(r);
+            const k=item.id || [item.date,item.cardName,item.hitokoto].join('|');
+            const prev=merged.get(k);
+            merged.set(k,prev?newerEntry(prev,item):item);
+          }
+        }
+      }catch(e){}
+    }
+  }catch(e){}
+
+  const before=(await getAll()).length;
+  for(const item of merged.values()) await putEntry(item);
+  entries=await getAll();
+  const added=Math.max(0,entries.length-before);
+  if(showMessage){
+    const msg='総当たり捜索完了：'+names.size+'個のDB、'+foundStores+'個の保存場所、localStorage '+localHits+'件を確認。見つけた候補は延べ'+foundEntries+'枚、現在'+entries.length+'枚です。'+(added?' '+added+'枚を復旧しました。':' 新しく復旧する作品はありませんでした。');
+    if($('rescueStatus')) $('rescueStatus').textContent=msg;
+    alert(msg);
+  }
+  return {foundDatabases,foundStores,foundEntries,localHits,added,total:entries.length};
+}
+async function init(){
+  try{
+    db=await openNamedDB(DB_NAME);
+    const result=await rescueOldData(false);
+    entries=await getAll();
+    updateStatus();
+    render();
+    if(result.added>0){
+      $('motto').textContent=result.added+'枚、昔の保存庫から戻りました。';
+      $('saveStatus').textContent='復旧しました。作品：'+entries.length+'枚';
+    }
+  }catch(e){
+    $('saveStatus').textContent='保存庫エラー：Safariで開いてください';
+    alert('保存庫を開けませんでした。Safariで開いてください。');
+  }
+}
+function updateStatus(){
+  $('saveStatus').textContent='作品：'+entries.length+'枚';
+  $('count').textContent=entries.length;
+  const bs=$('backupStatus');
+  if(bs) bs.textContent='現在 '+entries.length+' 枚あります。控えを書き出すと、写真込みで保存できます。';
+  updateBackupDisplay();
+}
+function readFile(file){
+  return new Promise(resolve=>{
+    if(!file){
+      resolve('');
+      return;
+    }
+    const fr=new FileReader();
+    fr.onload=()=>resolve(fr.result);
+    fr.readAsDataURL(file);
+  });
+}
+function preview(el,src){
+  if(!src){
+    el.classList.add('hide');
+    el.innerHTML='';
+    return;
+  }
+  el.classList.remove('hide');
+  el.innerHTML='<img src="'+src+'">';
+}
+$('catPhoto').onchange=async e=>{
+  catData=await readFile(e.target.files[0]);
+  preview($('catPreview'),catData);
+}
+function selectedTags(){
+  return [...document.querySelectorAll('input[name=tag]:checked')].map(x=>x.value);
+}
+
+$('form').onsubmit=async e=>{
+  e.preventDefault();
+  const now=Date.now();
+  const old=editingId ? entries.find(x=>x.id===editingId) : null;
+  const entry={
+    id:editingId || String(now)+'-'+Math.random().toString(36).slice(2),
+    date:$('date').value,
+    createdAt:originalCreatedAt || now,
+    updatedAt:editingId ? now : undefined,
+    cardName:v('cardName'),
+    catPhoto:catData || (old ? old.catPhoto : ''),
+    hitokoto:v('hitokoto'),
+    reading:v('reading'),
+    tags:selectedTags(),
+    memo:v('memo'),
+    fav:old ? !!old.fav : false,
+    views:old ? (old.views || 0) : 0,
+    lastViewed:old ? old.lastViewed : undefined
+  };
+  try{
+    await putEntry(entry);
+    entries=await getAll();
+    reset();
+    $('motto').textContent=editingId?'一枚を編集しました。':'一枚が、図書館に入りました。';
+    $('formStatus').textContent='保存しました。作品が '+entries.length+' 枚あります。';
+    render();
+    show('library');
+  }catch(err){
+    alert('保存できませんでした。写真が大きすぎる可能性があります。');
+  }
+};
+
+$('clear').onclick=reset;
+$('cancelEdit').onclick=reset;
+$('search').oninput=render;
+$('clearSearch').onclick=()=>{$('search').value='';filter='all';$('randomView').innerHTML='';$('popularView').innerHTML='';render()};
+$('all').onclick=()=>{$('search').value='';filter='all';$('randomView').innerHTML='';$('popularView').innerHTML='';render()};
+$('favOnly').onclick=()=>{filter='fav';$('randomView').innerHTML='';$('popularView').innerHTML='';render()};
+$('newFirst').onclick=()=>{sort='new';render()};
+$('oldFirst').onclick=()=>{sort='old';render()};
+$('randomOne').onclick=showRandom;
+$('popularOne').onclick=showPopular;
+
+function entryText(e){
+  return [e.hitokoto,e.cardName,(Array.isArray(e.tags)?e.tags.join(' '):e.tags),e.memo,e.reading].join(' ').toLowerCase();
+}
+function sortedFilteredEntries(){
+  let q=$('search').value.trim().toLowerCase();
+  let arr=[...entries];
+
+  if(filter==='fav') arr=arr.filter(e=>e.fav);
+  if(q) arr=arr.filter(e=>entryText(e).includes(q));
+
+  arr.sort((a,b)=>{
+    return sort==='new' ? (b.createdAt||0)-(a.createdAt||0) : (a.createdAt||0)-(b.createdAt||0);
+  });
+  return arr;
+}
+function searchByTag(tag){
+  $('search').value=tag;
+  filter='all';
+  sort='new';
+  closeDetail();
+  show('library');
+  render();
+}
+function openPhoto(src){
+  if(!src) return;
+  $('modalImg').src=src;
+  $('photoModal').classList.add('open');
+}
+$('modalClose').onclick=()=>$('photoModal').classList.remove('open');
+$('photoModal').onclick=e=>{
+  if(e.target.id==='photoModal') $('photoModal').classList.remove('open');
+};
+
+function renderTagList(){
+  const counts={};
+  entries.forEach(e=>{
+    (Array.isArray(e.tags)?e.tags:[]).forEach(t=>counts[t]=(counts[t]||0)+1);
+  });
+  const area=$('tagList');
+  if(!area) return;
+  const items=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+  area.innerHTML=items.map(t=>'<button class="btn tagFilter" data-tag="'+esc(t)+'">'+esc(t)+'：'+counts[t]+'枚</button>').join('');
+  area.querySelectorAll('.tagFilter').forEach(b=>b.onclick=()=>searchByTag(b.dataset.tag));
+}
+
+function showRandom(){
+  const arr=[...entries];
+  if(!arr.length){
+    $('randomView').innerHTML='<div class="note">まだ作品がありません。</div>';
+    return;
+  }
+  const e=arr[Math.floor(Math.random()*arr.length)];
+  const tags=(Array.isArray(e.tags)?e.tags:[]).map(t=>'<span class="tagPill" data-tag="'+esc(t)+'">'+esc(t)+'</span>').join('');
+  $('popularView').innerHTML='';
+  $('randomView').innerHTML=
+    '<div class="note ok"><strong>ランダムに選ばれた一枚</strong><br>'+
+    fmt(e.date)+' '+timeText(e.createdAt)+'<br>'+
+    esc(e.cardName)+'<br><br>'+
+    '<strong>'+esc(e.hitokoto)+'</strong>'+
+    (e.catPhoto?'<img src="'+e.catPhoto+'">':'')+
+    (tags?'<div>'+tags+'</div>':'')+
+    '<div class="actions"><button class="btn primary" id="openRandom">この作品を開く</button><button class="btn" id="againRandom">もう一度えらぶ</button></div></div>';
+  $('openRandom').onclick=()=>openDetail(e.id);
+  $('againRandom').onclick=showRandom;
+  $('randomView').querySelectorAll('.tagPill').forEach(p=>p.onclick=()=>searchByTag(p.dataset.tag));
+}
+
+function showPopular(){
+  $('randomView').innerHTML='';
+  const arr=[...entries].filter(e=>(e.views||0)>0).sort((a,b)=>(b.views||0)-(a.views||0));
+  if(!arr.length){
+    $('popularView').innerHTML='<div class="note">まだ閲覧回数はありません。作品を開くと記録されます。</div>';
+    return;
+  }
+
+  const medals=['🥇','🥈','🥉','4位','5位'];
+  const top=arr.slice(0,5).map((e,i)=>{
+    const tagHtml=(Array.isArray(e.tags)?e.tags:[]).map(t=>'<span class="tagPill" data-tag="'+esc(t)+'">'+esc(t)+'</span>').join('');
+    return '<article class="entry" data-id="'+esc(e.id)+'">'+
+      '<div class="date">'+medals[i]+'　'+(e.views||0)+'回見た</div>'+
+      '<div class="time">最後に見た：'+(e.lastViewed?fmtDateTime(e.lastViewed):'まだ記録なし')+'</div>'+
+      '<div class="name">'+esc(e.cardName)+'</div>'+
+      '<div class="hitokoto">'+esc(e.hitokoto)+'</div>'+
+      (tagHtml?'<div>'+tagHtml+'</div>':'')+
+      '<div class="meta">タップして詳細を見る</div>'+
+    '</article>';
+  }).join('');
+
+  $('popularView').innerHTML='<div class="note ok"><strong>よく読む言葉ランキング</strong><br>何度も開いた言葉ほど上に並びます。</div>'+top;
+  $('popularView').querySelectorAll('.entry').forEach(el=>el.onclick=()=>openDetail(el.dataset.id));
+  $('popularView').querySelectorAll('.tagPill').forEach(p=>p.onclick=ev=>{
+    ev.stopPropagation();
+    searchByTag(p.dataset.tag);
+  });
+}
+
+function render(){
+  updateStatus();
+  renderTagList();
+  const arr=sortedFilteredEntries();
+
+  $('list').innerHTML='';
+  if(!arr.length){
+    $('list').innerHTML='<div class="note">まだ展示はありません。最初の一枚をつくろう。</div>';
+    return;
+  }
+
+  arr.forEach(e=>{
+    const tagHtml=(Array.isArray(e.tags)?e.tags:[]).slice(0,3).map(t=>'<span class="tagPill" data-tag="'+esc(t)+'">'+esc(t)+'</span>').join('');
+    const div=document.createElement('article');
+    div.className='entry';
+    div.innerHTML=
+      '<div class="entryMini">'+
+        (e.catPhoto?'<img class="thumb" src="'+e.catPhoto+'">':'<div class="thumb thumbEmpty">no image</div>')+
+        '<div>'+
+          '<div class="date">'+fmt(e.date)+'</div>'+
+          '<div class="time">'+timeText(e.createdAt)+(e.updatedAt?' ／ 編集済み':'')+'</div>'+
+          '<div class="name">'+esc(e.cardName)+'</div>'+
+          '<div class="hitokoto">'+esc(e.hitokoto)+'</div>'+
+          (tagHtml?'<div>'+tagHtml+'</div>':'')+
+          '<div class="meta">タップして詳細を見る</div>'+
+        '</div>'+
+      '</div>';
+    div.onclick=()=>openDetail(e.id);
+    div.querySelectorAll('.tagPill').forEach(p=>p.onclick=ev=>{
+      ev.stopPropagation();
+      searchByTag(p.dataset.tag);
+    });
+    $('list').appendChild(div);
+  });
+}
+async function openDetail(id){
+  const e=entries.find(x=>x.id===id);
+  if(!e) return;
+  e.views=(e.views||0)+1;
+  e.lastViewed=Date.now();
+  await putEntry(e);
+  entries=await getAll();
+  const tagHtml=(Array.isArray(e.tags)?e.tags:[]).map(t=>'<span class="tagPill" data-tag="'+esc(t)+'">'+esc(t)+'</span>').join('');
+  $('libraryListView').classList.add('hide');
+  $('detailView').classList.remove('hide');
+  $('detailView').innerHTML=
+    '<button class="btn backBtn" id="backToList">← 図書館へ戻る</button>'+
+    '<article class="entry">'+
+      '<div class="date">'+fmt(e.date)+'</div>'+
+      '<div class="time">'+timeText(e.createdAt)+(e.updatedAt?' ／ 編集済み':'')+'</div>'+
+      '<div class="name">'+esc(e.cardName)+'</div>'+
+      '<div class="meta">'+(e.views||0)+'回見た'+(e.lastViewed?' ／ 最後に見た：'+fmtDateTime(e.lastViewed):'')+'</div>'+
+      '<div class="detailHitokoto">'+esc(e.hitokoto)+'</div>'+
+      (e.catPhoto?'<img class="detailPhoto" src="'+e.catPhoto+'">':'')+
+      (tagHtml?'<div>'+tagHtml+'</div>':'')+
+      (e.reading?'<div class="detailSection"><div class="detailTitle">カード解説メモ</div><div class="meta">'+esc(e.reading)+'</div></div>':'')+
+      (e.memo?'<div class="detailSection"><div class="detailTitle">ひとことメモ</div><div class="meta">'+esc(e.memo)+'</div></div>':'')+
+      '<div class="actions">'+
+        '<button class="btn fav">'+(e.fav?'★お気に入り':'☆お気に入り')+'</button>'+
+        '<button class="btn edit editMain">編集</button>'+
+        '<button class="btn danger del">削除</button>'+
+      '</div>'+
+    '</article>';
+  $('backToList').onclick=closeDetail;
+  $('detailView').querySelectorAll('.tagPill').forEach(p=>p.onclick=()=>searchByTag(p.dataset.tag));
+  const detailPhoto=$('detailView').querySelector('.detailPhoto');
+  if(detailPhoto) detailPhoto.onclick=()=>openPhoto(e.catPhoto);
+  $('detailView').querySelector('.fav').onclick=async()=>{
+    e.fav=!e.fav;
+    await putEntry(e);
+    entries=await getAll();
+    openDetail(e.id);
+    render();
+  };
+  $('detailView').querySelector('.edit').onclick=()=>startEdit(e);
+  $('detailView').querySelector('.del').onclick=async()=>{
+    if(confirm('この一枚を削除しますか？')){
+      await deleteEntry(e.id);
+      entries=await getAll();
+      closeDetail();
+      render();
+      updateTest();
+    }
+  };
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function closeDetail(){
+  $('detailView').classList.add('hide');
+  $('detailView').innerHTML='';
+  $('libraryListView').classList.remove('hide');
+}
+function startEdit(e){
+  editingId=e.id;
+  originalCreatedAt=e.createdAt;
+  $('formTitle').textContent='この一枚を編集する';
+  $('submitBtn').textContent='保存する';
+  $('cancelEdit').classList.remove('hide');
+
+  $('date').value=e.date || new Date().toISOString().slice(0,10);
+  $('cardName').value=e.cardName || '';
+  $('hitokoto').value=e.hitokoto || '';
+  $('reading').value=e.reading || '';
+  $('memo').value=e.memo || '';
+  catData=e.catPhoto || '';
+  preview($('catPreview'),catData);
+  buildTags(Array.isArray(e.tags)?e.tags:[]);
+
+  show('make');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+async function updateTest(){
+  if(db) entries=await getAll();
+  updateStatus();
+  $('testResult').textContent='保存確認：現在 '+entries.length+' 枚保存されています。同じ日に何枚でも保存できます。';
+}
+if($('reloadCheck')) $('reloadCheck').onclick=updateTest;
+if($('rescueOld')) $('rescueOld').onclick=async()=>{
+  if($('rescueStatus')) $('rescueStatus').textContent='昔の保存庫を捜索中…';
+  await rescueOldData(true);
+  render();
+  updateTest();
+};
+if($('makeTest')) $('makeTest').onclick=async()=>{
+  const now=Date.now();
+  const test={
+    id:String(now)+'-test',
+    date:new Date().toISOString().slice(0,10),
+    createdAt:now,
+    cardName:'保存テスト',
+    catPhoto:'',
+    hitokoto:'これは保存テストです。',
+    reading:'詳細画面のテストです。',
+    tags:['巡航速度','一歩'],
+    memo:'ここが見えれば成功。',
+    fav:false
+  };
+  await putEntry(test);
+  entries=await getAll();
+  render();
+  updateTest();
+  alert('テストカードを保存しました。');
+}
+$('export').onclick=async()=>{
+  entries=await getAll();
+  const blob=new Blob([JSON.stringify(entries,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='yuruneko-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  localStorage.setItem(BACKUP_KEY,String(Date.now()));
+  updateBackupDisplay();
+  alert('控えを書き出しました。ファイルアプリのiCloud Driveまたはダウンロードに保存しておくと安心です。');
+}
+$('import').onchange=async e=>{
+  const f=e.target.files[0];
+  if(!f) return;
+  try{
+    const data=JSON.parse(await f.text());
+    if(!Array.isArray(data)) throw new Error();
+    const ok=confirm('この控えを読み込みます。\n\n現在の作品：'+entries.length+'枚\n控えファイル：'+data.length+'枚\n\n読み込みますか？');
+    if(!ok) return;
+    for(const item of data){
+      await putEntry(normalizeEntry(item));
+    }
+    entries=await getAll();
+    render();
+    updateTest();
+    alert(data.length+'枚読み込みました。図書館を復元しました。');
+  }catch{
+    alert('読み込めませんでした');
+  }
+}
+if($('wipe')) $('wipe').onclick=async()=>{
+  if(confirm('全部消しますか？')){
+    await clearDB();
+    entries=[];
+    closeDetail();
+    render();
+    updateTest();
+  }
+}
+function reset(){
+  editingId=null;
+  originalCreatedAt=null;
+  $('formTitle').textContent='一枚をつくる';
+  $('submitBtn').textContent='今日はこれでいい';
+  $('cancelEdit').classList.add('hide');
+  $('form').reset();
+  $('date').value=new Date().toISOString().slice(0,10);
+  catData='';
+  preview($('catPreview'),'');
+  buildTags();
+}
+function v(id){return $(id).value.trim()}
+function fmt(d){return (d||'').replaceAll('-','/')}
+function timeText(ms){
+  if(!ms) return '';
+  const d=new Date(ms);
+  return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function fmtDateTime(ms){
+  if(!ms) return '';
+  const d=new Date(ms);
+  return d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function esc(s){
+  return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+init();
+</script>
+</body>
+</html>
