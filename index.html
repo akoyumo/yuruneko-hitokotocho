@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#c9f6ff">
-<title>ゆるねこ一言帖 Version 26 自動控え版</title>
+<title>ゆるねこ一言帖 Version 27 まとめて取り込み版</title>
 <style>
 :root{
   --bg:#eafbff;--card:#fff;--ink:#292b36;--sub:#6f7e87;
@@ -146,9 +146,21 @@ button{cursor:pointer}
 </nav>
 
 <section id="make" class="panel on box">
-  <h2 id="formTitle">一枚をつくる</h2>
+  
+  <div class="backupStep" id="bulkImportBox">
+    <strong>📚 過去画像をまとめて取り込む</strong><br>
+    写真を一度に複数選ぶと、1画像＝1作品としてまとめて図書館へ入れます。<br>
+    日付は写真ファイルの日付を使い、カード名は「過去のゆるねこ」、タグは「過去画像」になります。
+    <input id="bulkPhotos" type="file" accept="image/*" multiple style="margin-top:12px">
+    <div class="actions">
+      <button class="btn primary" type="button" id="bulkImport">選んだ画像をまとめて保存</button>
+    </div>
+    <div class="status" id="bulkStatus"></div>
+  </div>
+
+<h2 id="formTitle">一枚をつくる</h2>
   <div class="note ok">
-    <strong>保存すると、図書館への保存と同時に「控えファイル」も自動で書き出します。</strong><br>
+    <strong>新しく1枚保存するときも、過去画像をまとめて取り込むときも、「控えファイル」を自動で書き出します。</strong><br>
     Safariの「履歴とWebサイトデータを消去」をしても、最新の控えファイルから復元できます。
   </div>
   <form id="form">
@@ -268,7 +280,7 @@ button{cursor:pointer}
   </div>
 </section>
 
-<div class="small">Version 26：作品を保存するたび、写真込みの控えファイルも自動で書き出します。</div>
+<div class="small">Version 27：過去画像のまとめて取り込み＋保存ごとの自動控え。</div>
 <div class="modal" id="photoModal"><button class="modalClose" id="modalClose">閉じる</button><img id="modalImg" alt="拡大写真"></div>
 </main>
 
@@ -672,6 +684,85 @@ $('catPhoto').onchange=async e=>{
   catData=await readFile(e.target.files[0]);
   preview($('catPreview'),catData);
 }
+
+function fileDateText(file){
+  const d=new Date(file.lastModified || Date.now());
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function imageToCompressedDataURL(file,maxSide=1400,quality=.82){
+  return new Promise((resolve,reject)=>{
+    const fr=new FileReader();
+    fr.onerror=()=>reject(new Error('画像を読み込めませんでした'));
+    fr.onload=()=>{
+      const img=new Image();
+      img.onerror=()=>reject(new Error('画像を開けませんでした'));
+      img.onload=()=>{
+        let w=img.naturalWidth,h=img.naturalHeight;
+        const scale=Math.min(1,maxSide/Math.max(w,h));
+        w=Math.max(1,Math.round(w*scale));
+        h=Math.max(1,Math.round(h*scale));
+        const canvas=document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.src=fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+async function importBulkPhotos(){
+  const files=[...($('bulkPhotos').files||[])];
+  if(!files.length){
+    alert('取り込む画像を選んでください。');
+    return;
+  }
+  const ok=confirm(files.length+'枚を、まとめて図書館へ保存しますか？');
+  if(!ok) return;
+
+  const btn=$('bulkImport');
+  btn.disabled=true;
+  let saved=0;
+  try{
+    for(let i=0;i<files.length;i++){
+      const file=files[i];
+      $('bulkStatus').textContent='取り込み中 '+(i+1)+' / '+files.length+'枚';
+      const now=Date.now()+i;
+      const photo=await imageToCompressedDataURL(file);
+      const baseName=(file.name||'').replace(/\.[^.]+$/,'');
+      const usefulName=baseName && !/^IMG[_-]?\d+$/i.test(baseName) ? baseName : '画像に残したゆるねこ一言';
+      await putEntry({
+        id:String(now)+'-bulk-'+Math.random().toString(36).slice(2),
+        date:fileDateText(file),
+        createdAt:file.lastModified || now,
+        cardName:'過去のゆるねこ',
+        catPhoto:photo,
+        hitokoto:usefulName,
+        reading:'',
+        tags:['過去画像'],
+        memo:'まとめて取り込み',
+        fav:false,
+        views:0
+      });
+      saved++;
+    }
+    entries=await getAll();
+    await writeAutomaticBackup('過去画像 '+saved+'枚まとめて取り込み');
+    render();
+    updateTest();
+    $('bulkPhotos').value='';
+    $('bulkStatus').textContent=saved+'枚を保存しました。控えファイルも書き出しました。';
+    alert(saved+'枚をまとめて保存しました。続けて控えファイルを「ダウンロード」してください。');
+    show('library');
+  }catch(err){
+    console.error(err);
+    alert(saved+'枚まで保存しました。途中で止まりました。画像枚数を半分に分けて、残りを取り込んでください。');
+  }finally{
+    btn.disabled=false;
+  }
+}
+
 function selectedTags(){
   return [...document.querySelectorAll('input[name=tag]:checked')].map(x=>x.value);
 }
@@ -754,6 +845,7 @@ $('favOnly').onclick=()=>{filter='fav';$('randomView').innerHTML='';$('popularVi
 $('newFirst').onclick=()=>{sort='new';render()};
 $('oldFirst').onclick=()=>{sort='old';render()};
 $('randomOne').onclick=showRandom;
+$('bulkImport').onclick=importBulkPhotos;
 $('popularOne').onclick=showPopular;
 
 function entryText(e){
