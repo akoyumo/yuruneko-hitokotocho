@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#c9f6ff">
-<title>ゆるねこ一言帖 Version 22 完成版</title>
+<title>ゆるねこ一言帖 Version 23 復旧安全版</title>
 <style>
 :root{
   --bg:#eafbff;--card:#fff;--ink:#292b36;--sub:#6f7e87;
@@ -200,6 +200,8 @@ button{cursor:pointer}
 <section id="test" class="panel box">
   <h2>保存確認</h2>
   <div class="note ok" id="testResult">保存庫の状態を確認します。</div>
+  <div class="actions"><button class="btn primary" id="rescueOld">昔の保存庫を探して復旧する</button></div>
+  <div class="status" id="rescueStatus"></div>
   <div class="actions hide">
     <button class="btn primary" id="reloadCheck">保存枚数を確認</button>
     <button class="btn" id="makeTest">テストカードを1枚保存</button>
@@ -257,13 +259,15 @@ button{cursor:pointer}
   </div>
 </section>
 
-<div class="small">Version 22：タグ絞り込み・よく読む言葉ランキングつき完成版。</div>
+<div class="small">Version 23：古い保存庫の自動捜索・復旧を強化した安全版。</div>
 <div class="modal" id="photoModal"><button class="modalClose" id="modalClose">閉じる</button><img id="modalImg" alt="拡大写真"></div>
 </main>
 
 <script>
-const DB_NAME='yuruneko_hitokoto_db_v22';
+// Version番号を保存庫名に入れない。今後の更新でも同じ保存庫を使う。
+const DB_NAME='yuruneko_hitokoto_db';
 const OLD_DBS=[
+  'yuruneko_hitokoto_db_v22',
   'yuruneko_hitokoto_db_v21',
   'yuruneko_hitokoto_db_v20',
   'yuruneko_hitokoto_db_v19',
@@ -277,9 +281,14 @@ const OLD_DBS=[
   'yuruneko_hitokoto_db_v11',
   'yuruneko_hitokoto_db_v10',
   'yuruneko_hitokoto_db_v9',
+  'yuruneko_hitokoto_db_v8',
   'yuruneko_hitokoto_db_v7',
   'yuruneko_hitokoto_db_v6',
-  'yuruneko_hitokoto_db_v5'
+  'yuruneko_hitokoto_db_v5',
+  'yuruneko_hitokoto_db_v4',
+  'yuruneko_hitokoto_db_v3',
+  'yuruneko_hitokoto_db_v2',
+  'yuruneko_hitokoto_db_v1'
 ];
 const STORE='entries';
 const TAGS=['巡航速度','ひとつずつ','一歩','気づき','ごきげん','余裕','手放す','休む'];
@@ -293,7 +302,7 @@ let editingId=null;
 let originalCreatedAt=null;
 
 const $=id=>document.getElementById(id);
-const BACKUP_KEY='yuruneko_last_backup_v17';
+const BACKUP_KEY='yuruneko_last_backup';
 function backupLabel(){
   const raw=localStorage.getItem(BACKUP_KEY);
   if(!raw) return 'まだありません';
@@ -427,31 +436,70 @@ function normalizeEntry(item){
     lastViewed:item.lastViewed || undefined
   };
 }
-async function migrateOldData(){
-  let current=await getAll();
-  if(current.length) return;
+async function existingDatabaseNames(){
+  try{
+    if(indexedDB.databases){
+      const list=await indexedDB.databases();
+      return new Set((list||[]).map(x=>x.name).filter(Boolean));
+    }
+  }catch(e){}
+  // databases() が使えない環境では既知の候補を調べる。
+  return new Set([DB_NAME,...OLD_DBS]);
+}
+function newerEntry(a,b){
+  const ta=Math.max(Number(a.updatedAt||0),Number(a.createdAt||0));
+  const tb=Math.max(Number(b.updatedAt||0),Number(b.createdAt||0));
+  return tb>ta?b:a;
+}
+async function rescueOldData(showMessage=false){
+  const names=await existingDatabaseNames();
+  const candidates=[DB_NAME,...OLD_DBS].filter((n,i,a)=>a.indexOf(n)===i && names.has(n));
+  const merged=new Map();
+  let foundDatabases=0;
+  let foundEntries=0;
 
-  for(const name of OLD_DBS){
+  for(const name of candidates){
     try{
-      const old=await openNamedDB(name);
-      const data=await allFromDB(old);
-      old.close();
+      const database=(name===DB_NAME && db)?db:await openNamedDB(name);
+      const data=await allFromDB(database);
+      if(name!==DB_NAME) database.close();
       if(data.length){
-        for(const item of data){
-          await putEntry(normalizeEntry(item));
-        }
-        return;
+        foundDatabases++;
+        foundEntries+=data.length;
+      }
+      for(const raw of data){
+        const item=normalizeEntry(raw);
+        const prev=merged.get(item.id);
+        merged.set(item.id,prev?newerEntry(prev,item):item);
       }
     }catch(e){}
   }
+
+  const before=(await getAll()).length;
+  for(const item of merged.values()) await putEntry(item);
+  entries=await getAll();
+  const added=Math.max(0,entries.length-before);
+
+  if(showMessage){
+    const msg=foundEntries
+      ? '捜索完了：'+foundDatabases+'個の保存庫から延べ'+foundEntries+'枚を確認し、現在'+entries.length+'枚です。'+(added?' '+added+'枚を復旧しました。':' 新しく復旧する作品はありませんでした。')
+      : '古い保存庫を探しましたが、この画面から見える作品は見つかりませんでした。';
+    if($('rescueStatus')) $('rescueStatus').textContent=msg;
+    alert(msg);
+  }
+  return {foundDatabases,foundEntries,added,total:entries.length};
 }
 async function init(){
   try{
     db=await openNamedDB(DB_NAME);
-    await migrateOldData();
+    const result=await rescueOldData(false);
     entries=await getAll();
     updateStatus();
     render();
+    if(result.added>0){
+      $('motto').textContent=result.added+'枚、昔の保存庫から戻りました。';
+      $('saveStatus').textContent='復旧しました。作品：'+entries.length+'枚';
+    }
   }catch(e){
     $('saveStatus').textContent='保存庫エラー：Safariで開いてください';
     alert('保存庫を開けませんでした。Safariで開いてください。');
@@ -747,6 +795,12 @@ async function updateTest(){
   $('testResult').textContent='保存確認：現在 '+entries.length+' 枚保存されています。同じ日に何枚でも保存できます。';
 }
 if($('reloadCheck')) $('reloadCheck').onclick=updateTest;
+if($('rescueOld')) $('rescueOld').onclick=async()=>{
+  if($('rescueStatus')) $('rescueStatus').textContent='昔の保存庫を捜索中…';
+  await rescueOldData(true);
+  render();
+  updateTest();
+};
 if($('makeTest')) $('makeTest').onclick=async()=>{
   const now=Date.now();
   const test={
