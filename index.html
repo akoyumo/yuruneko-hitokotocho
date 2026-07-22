@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#eaf8fb">
+  <meta name="description" content="帰ってきたくなる図書館。毎朝のゆるねこ一言を残して、読み返すためのアプリです。">
+  <title>ゆるねこ一言帖</title>
+
+  <link rel="icon" href="favicon.png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div id="app" class="app-shell">
+
+    <header class="app-header">
+      <button
+        id="headerBackButton"
+        class="icon-button is-hidden"
+        type="button"
+        aria-label="前の画面に戻る"
+      >
+        ←
+      </button>
+
+      <div class="app-header__title">
+        <p id="headerEyebrow" class="app-header__eyebrow">ゆるねこ一言帖</p>
+        <h1 id="headerTitle">おかえりなさい。</h1>
+      </div>
+
+      <div class="librarian-cat" aria-label="司書ねこ">
+        <span aria-hidden="true">🐈</span>
+      </div>
+    </header>
+
+    <main id="mainContent">
+
+      <section
+        id="screen-home"
+        class="screen is-active"
+        data-screen="home"
+        aria-labelledby="homeTitle"
+      >
+        <div class="home-intro">
+          <p id="todayDate" class="today-date"></p>
+          <h2 id="homeTitle">おかえりなさい。</h2>
+        </div>
+
+        <article id="todayCard" class="today-card">
+          <div class="today-card__label">🌸 今日の一枚</div>
+
+          <div class="today-card__photo">
+            <img id="todayCardImage" src="" alt="" hidden>
+
+            <div id="todayCardPlaceholder" class="photo-placeholder">
+              <span aria-hidden="true">🐾</span>
+              <p>今日のねこ写真</p>
+            </div>
+          </div>
+
+          <div class="today-card__body">
+            <p id="todayCardText" class="today-card__text">
+              今日の一言が、ここに表示されます。
+            </p>
+
+            <div class="today-card__meta">
+              <span id="todayCardName">カード名</span>
+              <span id="todayCardDate">日付</span>
+            </div>
+
+            <button
+              class="primary-button"
+              type="button"
+              data-open-reading="today"
+            >
+              この一枚を読む
+            </button>
+          </div>
+        </article>
+
+        <div class="home-grid" aria-label="図書館の入口">
+          <button class="home-room-card" type="button" data-go="surprise">
+            <span class="home-room-card__icon">🎁</span>
+            <span class="home-room-card__title">神楽のお楽しみ箱</span>
+            <span class="home-room-card__description">一枚、そっと選びます。</span>
+          </button>
+
+          <button class="home-room-card" type="button" data-go="themes">
+            <span class="home-room-card__icon">🌿</span>
+            <span class="home-room-card__title">テーマ散歩</span>
+            <span class="home-room-card__description">今の気分から歩きます。</span>
+          </button>
+
+          <button class="home-room-card" type="button" data-go="flip">
+            <span class="home-room-card__icon">📖</span>
+            <span class="home-room-card__title">めくる</span>
+            <span class="home-room-card__description">一枚ずつ読みます。</span>
+          </button>
+
+          <button class="home-room-card" type="button" data-go="recent">
+            <span class="home-room-card__icon">🕰️</span>
+            <span class="home-room-card__title">この頃の自分</span>
+            <span class="home-room-card__description">最近の言葉をたどります。</span>
+          </button>
+
+          <button class="home-room-card" type="button" data-go="small-shelf">
+            <span class="home-room-card__icon">📚</span>
+            <span class="home-room-card__title">小さな本棚</span>
+            <span class="home-room-card__description">お気に入りを集めます。</span>
+          </button>
+
+          <button class="home-room-card" type="button" data-screen-link="bookshelf">
+            <span class="home-room-card__icon">🏛️</span>
+            <span class="home-room-card__title">本棚</span>
+            <span class="home-room-card__description">すべての一言を見渡します。</span>
+          </button>
+        </div>
+      </section>
+
+      <section
+        id="screen-bookshelf"
+        class="screen"
+        data-screen="bookshelf"
+        aria-labelledby="bookshelfTitle"
+        hidden
+      >
+        <div class="screen-heading">
+          <div>
+            <p class="screen-heading__eyebrow">図書館の中へ</p>
+            <h2 id="bookshelfTitle">本棚</h2>
+          </div>
+          <p id="bookshelfCount" class="screen-heading__count">0冊</p>
+        </div>
+
+        <div class="bookshelf-tools">
+          <label class="search-box">
+            <span class="visually-hidden">一言を検索</span>
+            <input
+              id="bookshelfSearch"
+              type="search"
+              placeholder="言葉・カード名・日付で探す"
+              autocomplete="off"
+            >
+          </label>
+
+          <div id="themeChips" class="theme-chips" aria-label="テーマで絞り込む">
+            <button class="theme-chip is-active" type="button" data-theme="all">
+              すべて
+            </button>
+          </div>
+
+          <button id="sortButton" class="text-button" type="button">
+            新しい順 ↓
+          </button>
+        </div>
+
+        <div id="bookshelfList" class="bookshelf-list"></div>
+
+        <div id="bookshelfEmpty" class="empty-state" hidden>
+          <p>その言葉は、まだこの本棚にはないみたい。</p>
+          <p>検索を少し短くしてみてね。</p>
+        </div>
+
+        <footer class="shelf-end">
+          <strong>📖 本棚の終わり</strong>
+          <p>また読みに来てね。</p>
+        </footer>
+      </section>
+
+      <section
+        id="screen-reading"
+        class="screen"
+        data-screen="reading"
+        aria-labelledby="readingTitle"
+        hidden
+      >
+        <article class="reading-seat">
+          <div class="reading-seat__photo">
+            <img id="readingImage" src="" alt="" hidden>
+
+            <div id="readingPlaceholder" class="photo-placeholder">
+              <span aria-hidden="true">🐈</span>
+              <p>ねこ写真</p>
+            </div>
+          </div>
+
+          <div class="reading-seat__content">
+            <p id="readingDate" class="reading-seat__date"></p>
+
+            <h2 id="readingTitle" class="reading-seat__text">
+              ゆるねこ一言
+            </h2>
+
+            <div class="reading-seat__meta">
+              <span id="readingCardName">カード名</span>
+            </div>
+
+            <div id="readingThemes" class="reading-seat__themes"></div>
+
+            <section class="reading-seat__memo" aria-labelledby="readingMemoTitle">
+              <h3 id="readingMemoTitle">今日のメモ</h3>
+              <p id="readingMemo">メモはありません。</p>
+            </section>
+          </div>
+        </article>
+      </section>
+
+      <section
+        id="screen-create"
+        class="screen"
+        data-screen="create"
+        aria-labelledby="createTitle"
+        hidden
+      >
+        <div class="desk-heading">
+          <div>
+            <p class="screen-heading__eyebrow">今日の机</p>
+            <h2 id="createTitle">新しく作る</h2>
+          </div>
+
+          <div class="cat-paw" aria-label="ねこの手">
+            <span aria-hidden="true">🐾</span>
+          </div>
+        </div>
+
+        <form id="entryForm" class="entry-form">
+          <label class="form-field">
+            <span>日付</span>
+            <input id="entryDate" name="date" type="date" required>
+          </label>
+
+          <label class="form-field">
+            <span>タロットカード</span>
+            <input
+              id="entryCardName"
+              name="cardName"
+              type="text"
+              placeholder="例：死神"
+              required
+            >
+          </label>
+
+          <label class="form-field form-field--large">
+            <span>今日のゆるねこ一言</span>
+            <textarea
+              id="entryText"
+              name="text"
+              rows="4"
+              placeholder="今日の一言を書きます。"
+              required
+            ></textarea>
+          </label>
+
+          <fieldset class="form-field">
+            <legend>テーマ（複数選べます）</legend>
+
+            <div id="entryThemeOptions" class="theme-selector"></div>
+          </fieldset>
+
+          <label class="form-field form-field--large">
+            <span>今日のメモ</span>
+            <textarea
+              id="entryMemo"
+              name="memo"
+              rows="4"
+              placeholder="カードの読みや、今日の出来事。"
+            ></textarea>
+          </label>
+
+          <label class="photo-picker">
+            <span>ねこ写真</span>
+
+            <input
+              id="entryImage"
+              name="image"
+              type="file"
+              accept="image/*"
+            >
+
+            <span class="secondary-button">写真を選ぶ</span>
+          </label>
+
+          <div id="entryImagePreview" class="image-preview" hidden>
+            <img src="" alt="選んだねこ写真の確認">
+          </div>
+
+          <button class="primary-button primary-button--wide" type="submit">
+            本棚にしまう
+          </button>
+        </form>
+      </section>
+
+      <section
+        id="screen-backup"
+        class="screen"
+        data-screen="backup"
+        aria-labelledby="backupTitle"
+        hidden
+      >
+        <div class="archive-heading">
+          <div class="archive-librarian" aria-label="書庫で働く司書ねこ">
+            <span aria-hidden="true">🐈‍⬛📖</span>
+          </div>
+
+          <div>
+            <p class="screen-heading__eyebrow">図書館の書庫</p>
+            <h2 id="backupTitle">控え</h2>
+          </div>
+        </div>
+
+        <section class="backup-status">
+          <div>
+            <p class="backup-status__label">最後の控え</p>
+            <p id="lastBackupDate" class="backup-status__value">まだありません</p>
+          </div>
+
+          <div>
+            <p class="backup-status__label">預かっている一言</p>
+            <p id="backupEntryCount" class="backup-status__value">0冊</p>
+          </div>
+        </section>
+
+        <div class="backup-actions">
+          <button id="exportBackupButton" class="primary-button" type="button">
+            控えを書き出す
+          </button>
+
+          <label class="secondary-button file-button">
+            控えから戻す
+            <input
+              id="importBackupInput"
+              type="file"
+              accept=".json,application/json"
+              hidden
+            >
+          </label>
+        </div>
+
+        <section class="archive-note">
+          <h3>司書ねこから</h3>
+          <p>
+            大切な一言は、図書館の外にも控えを置いておくと安心です。
+          </p>
+        </section>
+      </section>
+
+      <section
+        id="screen-settings"
+        class="screen"
+        data-screen="settings"
+        aria-labelledby="settingsTitle"
+        hidden
+      >
+        <div class="screen-heading">
+          <div>
+            <p class="screen-heading__eyebrow">図書館のお手入れ</p>
+            <h2 id="settingsTitle">設定</h2>
+          </div>
+        </div>
+
+        <div class="settings-list">
+          <section class="settings-group">
+            <h3>表示</h3>
+
+            <label class="setting-row">
+              <span>
+                <strong>文字を少し大きくする</strong>
+                <small>一言をゆったり読みます。</small>
+              </span>
+
+              <input id="largeTextToggle" type="checkbox">
+            </label>
+
+            <label class="setting-row">
+              <span>
+                <strong>静かな動き</strong>
+                <small>画面の動きを控えめにします。</small>
+              </span>
+
+              <input id="reducedMotionToggle" type="checkbox">
+            </label>
+          </section>
+
+          <section class="settings-group">
+            <h3>図書館</h3>
+
+            <button id="openBackupFromSettings" class="setting-link" type="button">
+              <span>
+                <strong>控えを確認する</strong>
+                <small>書き出し・復元を行います。</small>
+              </span>
+
+              <span aria-hidden="true">›</span>
+            </button>
+
+            <button id="sendFeedbackButton" class="setting-link" type="button">
+              <span>
+                <strong>ご意見・ご感想を送る</strong>
+                <small>あなたの声が、図書館を育ててくれます。</small>
+              </span>
+
+              <span aria-hidden="true">›</span>
+            </button>
+          </section>
+
+          <section class="settings-group settings-group--danger">
+            <h3>データ</h3>
+
+            <button id="deleteAllButton" class="danger-button" type="button">
+              すべての一言を削除する
+            </button>
+          </section>
+        </div>
+
+        <p class="app-version">ゆるねこ一言帖 Version 1.0</p>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="図書館メニュー">
+      <button type="button" data-screen-link="backup">
+        <span aria-hidden="true">🗄️</span>
+        <span>控え</span>
+      </button>
+
+      <button
+        class="bottom-nav__create"
+        type="button"
+        data-screen-link="create"
+      >
+        <span aria-hidden="true">＋</span>
+        <span>新しく作る</span>
+      </button>
+
+      <button type="button" data-screen-link="settings">
+        <span aria-hidden="true">⚙️</span>
+        <span>設定</span>
+      </button>
+    </nav>
+  </div>
+
+  <dialog id="appDialog" class="app-dialog">
+    <div class="app-dialog__content">
+      <h2 id="dialogTitle">お知らせ</h2>
+      <p id="dialogMessage"></p>
+      <div id="dialogActions" class="app-dialog__actions"></div>
+    </div>
+  </dialog>
+
+  <script src="data.js"></script>
+  <script src="storage.js"></script>
+  <script src="backup.js"></script>
+  <script src="ui.js"></script>
+  <script src="app.js?v=1.2"></script>
+</body>
+</html>
